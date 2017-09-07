@@ -16,10 +16,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshLoadmoreListener;
 
@@ -27,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements OnRefreshListener, OnRefreshLoadmoreListener, Handler.Callback {
+public class MainActivity extends AppCompatActivity implements OnRefreshListener, OnRefreshLoadmoreListener, Handler.Callback, View.OnClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerViewAdapter adapter;
@@ -36,6 +39,10 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
     private Handler mHandler;
     private View colorStatus;
     private int dimensionPixelSize;
+    private Button top;
+    private RecyclerView recyclerView;
+    private StaggeredGridLayoutManager layoutManager;
+    private ClassicsHeader classicsHeader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,19 +55,20 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
             decorView.setSystemUiVisibility(option);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
+        top = (Button) findViewById(R.id.top);
+        top.setOnClickListener(this);
         mHandler = new Handler(this);
 //        initFruits();
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         colorStatus = findViewById(R.id.color_status);
         ViewGroup.LayoutParams layoutParams = colorStatus.getLayoutParams();
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if(resourceId>0){
+        if (resourceId > 0) {
             dimensionPixelSize = getResources().getDimensionPixelSize(resourceId);
         }
-        layoutParams.height=dimensionPixelSize;
+        layoutParams.height = dimensionPixelSize;
         colorStatus.setLayoutParams(layoutParams);
-        final StaggeredGridLayoutManager layoutManager = new
-                StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -73,23 +81,25 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
                 super.onScrolled(recyclerView, dx, dy);
                 int[] firstVisibleItemPositions = layoutManager.findFirstVisibleItemPositions(new int[2]);
                 if (firstVisibleItemPositions[0] != 0) {
+                    top.setVisibility(View.VISIBLE);
+
                 } else {
+                    top.setVisibility(View.GONE);
                     View view = layoutManager.findViewByPosition(0);
                     int top = view.getTop();
                     int height = view.getHeight();
                     int distance = height - Math.abs(top);
                     TypedValue typedValue = new TypedValue();
-                    int actionBarHeight=0;
+                    int actionBarHeight = 0;
                     if (getTheme().resolveAttribute(R.attr.actionBarSize, typedValue, true)) {
-                        actionBarHeight = TypedValue.complexToDimensionPixelSize(typedValue.data,getResources().getDisplayMetrics());
+                        actionBarHeight = TypedValue.complexToDimensionPixelSize(typedValue.data, getResources().getDisplayMetrics());
                     }
-                    if(distance<=actionBarHeight+50){
+                    if (distance <= actionBarHeight + 50) {
                         relativeLayout.setBackgroundColor(Color.parseColor("#ffffffff"));
                         colorStatus.setBackgroundColor(Color.parseColor("#999999"));
-                    }else {
+                    } else {
                         relativeLayout.setBackgroundColor(Color.parseColor("#00FFFFFF"));
                         colorStatus.setBackgroundColor(Color.parseColor("#00FFFFFF"));
-
                     }
 
                 }
@@ -103,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
         smartRefreshLayout = (SmartRefreshLayout) findViewById(R.id.smartLayout);
         smartRefreshLayout.setOnRefreshLoadmoreListener(this);
         relativeLayout = (RelativeLayout) findViewById(R.id.action_bar);
+        classicsHeader = (ClassicsHeader) findViewById(R.id.classic_header);
 
 
         initFruitsOne();
@@ -201,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 
     @Override
     public void onLoadmore(RefreshLayout refreshlayout) {
-        mHandler.sendEmptyMessageDelayed(1, 3000);
+        mHandler.sendEmptyMessageDelayed(0, 3000);
 
 
     }
@@ -217,4 +228,10 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 
         return false;
     }
+
+    @Override
+    public void onClick(View view) {
+        layoutManager.scrollToPosition(0);
+    }
+
 }
