@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
                     if (getTheme().resolveAttribute(R.attr.actionBarSize, typedValue, true)) {
                         actionBarHeight = TypedValue.complexToDimensionPixelSize(typedValue.data,getResources().getDisplayMetrics());
                     }
-                    if(distance<=actionBarHeight){
+                    if(distance<=actionBarHeight+50){
                         relativeLayout.setBackgroundColor(Color.parseColor("#ffffffff"));
                         colorStatus.setBackgroundColor(Color.parseColor("#999999"));
                     }else {
