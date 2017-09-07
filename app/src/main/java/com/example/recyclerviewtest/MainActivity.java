@@ -17,12 +17,17 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshFooter;
+import com.scwang.smartrefresh.layout.api.RefreshHeader;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.scwang.smartrefresh.layout.listener.OnMultiPurposeListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshLoadmoreListener;
 
@@ -30,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements OnRefreshListener, OnRefreshLoadmoreListener, Handler.Callback, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements Handler.Callback, View.OnClickListener, OnMultiPurposeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerViewAdapter adapter;
@@ -42,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
     private Button top;
     private RecyclerView recyclerView;
     private StaggeredGridLayoutManager layoutManager;
-    private ClassicsHeader classicsHeader;
+    private LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 //        FruitAdapter adapter = new FruitAdapter(fruitList);
         recyclerView.setAdapter(adapter);
         smartRefreshLayout = (SmartRefreshLayout) findViewById(R.id.smartLayout);
-        smartRefreshLayout.setOnRefreshLoadmoreListener(this);
+        smartRefreshLayout.setOnMultiPurposeListener(this);
         relativeLayout = (RelativeLayout) findViewById(R.id.action_bar);
-        classicsHeader = (ClassicsHeader) findViewById(R.id.classic_header);
+        linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
 
 
         initFruitsOne();
@@ -208,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
     @Override
     public void onRefresh(RefreshLayout refreshlayout) {
         mHandler.sendEmptyMessageDelayed(0, 3000);
+
     }
 
     @Override
@@ -221,8 +227,10 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
     public boolean handleMessage(Message message) {
         switch (message.what) {
             case 0:
+
                 smartRefreshLayout.finishRefresh();
                 smartRefreshLayout.finishLoadmore();
+
                 break;
         }
 
@@ -234,4 +242,55 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
         layoutManager.scrollToPosition(0);
     }
 
+    @Override
+    public void onHeaderPulling(RefreshHeader header, float percent, int offset, int headerHeight, int extendHeight) {
+        linearLayout.setVisibility(View.GONE);
+        linearLayout.scrollTo(0,-offset);
+
+
+    }
+
+    @Override
+    public void onHeaderReleasing(RefreshHeader header, float percent, int offset, int headerHeight, int extendHeight) {
+        linearLayout.scrollTo(0,-offset);
+        linearLayout.setVisibility(View.VISIBLE);
+
+    }
+
+    @Override
+    public void onHeaderStartAnimator(RefreshHeader header, int headerHeight, int extendHeight) {
+
+    }
+
+    @Override
+    public void onHeaderFinish(RefreshHeader header, boolean success) {
+
+
+
+    }
+
+    @Override
+    public void onFooterPulling(RefreshFooter footer, float percent, int offset, int footerHeight, int extendHeight) {
+
+    }
+
+    @Override
+    public void onFooterReleasing(RefreshFooter footer, float percent, int offset, int footerHeight, int extendHeight) {
+
+    }
+
+    @Override
+    public void onFooterStartAnimator(RefreshFooter footer, int footerHeight, int extendHeight) {
+
+    }
+
+    @Override
+    public void onFooterFinish(RefreshFooter footer, boolean success) {
+
+    }
+
+    @Override
+    public void onStateChanged(RefreshLayout refreshLayout, RefreshState oldState, RefreshState newState) {
+
+    }
 }
